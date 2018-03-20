@@ -25,14 +25,17 @@ type JwtToken struct {
 type Exception struct {
 	Message string `json:"message"`
 }
-
+var user User
 func CreateTokenEndpoint(w http.ResponseWriter, req *http.Request) {
-	var user User
+//	var user User
 	_ = json.NewDecoder(req.Body).Decode(&user)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.Username,
 		"password": user.Password,
 	})
+fmt.Print(user.Username)
+fmt.Print(user.Password)
+//fmt.Print(token.SignedString)
 	tokenString, error := token.SignedString([]byte("secret"))
 	if error != nil {
 		fmt.Println(error)
@@ -96,8 +99,9 @@ func TestEndpoint(w http.ResponseWriter, req *http.Request) {
 func main() {
 	router := mux.NewRouter()
 	fmt.Println("Starting the application...")
+// fmt.Print(user.username)
 	router.HandleFunc("/authenticate", CreateTokenEndpoint).Methods("POST")
 	router.HandleFunc("/protected", ProtectedEndpoint).Methods("GET")
 	router.HandleFunc("/test", ValidateMiddleware(TestEndpoint)).Methods("GET")
-	log.Fatal(http.ListenAndServe(":12345", router))
+	log.Fatal(http.ListenAndServe(":1234", router))
 }
