@@ -124,6 +124,62 @@ err = c.Update(bson.M{"username": user.Username,"password":user.Password}, bson.
 }
 //}
 
+func retrieve(w http.ResponseWriter, req *http.Request) {
+var user User
+ _ = json.NewDecoder(req.Body).Decode(&user)
+session, err := mgo.Dial("127.0.0.1")
+      if err != nil {
+            panic(err)
+  }
+
+        defer session.Close()
+
+         session.SetMode(mgo.Monotonic, true)
+        // Collection People
+
+c := session.DB("test4").C("people")
+fmt.Print("connection established")
+err = c.Find(bson.M{"username": user.Username,"password":user.Password}).One(&user)
+if err != nil {
+//    if err.Error() == "not found" {
+        log.Println("No such document")
+
+
+  }  else
+{
+log.Print("ok")
+fmt.Print(user)
+}
+}
+
+func retrieveAll(w http.ResponseWriter, req *http.Request) {
+var user User
+ _ = json.NewDecoder(req.Body).Decode(&user)
+session, err := mgo.Dial("127.0.0.1")
+      if err != nil {
+            panic(err)
+  }
+
+        defer session.Close()
+
+         session.SetMode(mgo.Monotonic, true)
+        // Collection People
+
+c := session.DB("test4").C("people")
+fmt.Print("connection established")
+
+  err = c.Find(nil).All(&user)
+    if err != nil {
+        // TODO: Do something about the error
+    } else {
+s := make([]byte,15,15) 
+s=&user
+        fmt.Println("Results All: ", s) 
+    }
+
+
+}
+
 
 func main() {
         router := mux.NewRouter()
@@ -131,6 +187,8 @@ func main() {
 
         router.HandleFunc("/signup", signup).Methods("POST")
         router.HandleFunc("/login", login).Methods("POST")
+ router.HandleFunc("/retrieve", retrieve).Methods("POST")
+router.HandleFunc("/retrieveAll", retrieveAll).Methods("POST")
 log.Fatal(http.ListenAndServe(":12345", router))
 }
 
