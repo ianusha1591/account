@@ -3,6 +3,7 @@ package main
 import (
         "encoding/json"
         "fmt"
+
 //        "github.com/jinzhu/now"
         "gopkg.in/mgo.v2/bson"
         "time"
@@ -118,8 +119,8 @@ fmt.Print(user.Password)
         json.NewEncoder(w).Encode(User{Token: tokenString})
 fmt.Print(tokenString)
 err = c.Update(bson.M{"username": user.Username,"password":user.Password}, bson.M{"$set": bson.M{"token": tokenString}})
-//now := TimeFunc().Unix()
-//	if (now > Claims["exp"] ) { fmt.Print("expired") }
+ //doEvery(1*time.Minute , tokenexpired)
+
 }
 }
 //}
@@ -152,33 +153,8 @@ fmt.Print(user)
 }
 }
 
-func retrieveAll(w http.ResponseWriter, req *http.Request) {
-var user User
- _ = json.NewDecoder(req.Body).Decode(&user)
-session, err := mgo.Dial("127.0.0.1")
-      if err != nil {
-            panic(err)
-  }
-
-        defer session.Close()
-
-         session.SetMode(mgo.Monotonic, true)
-        // Collection People
-
-c := session.DB("test4").C("people")
-fmt.Print("connection established")
-
-  err = c.Find(nil).All(&user)
-    if err != nil {
-        // TODO: Do something about the error
-    } else {
-s := make([]byte,15,15) 
-s=&user
-        fmt.Println("Results All: ", s) 
-    }
 
 
-}
 
 
 func main() {
@@ -188,7 +164,7 @@ func main() {
         router.HandleFunc("/signup", signup).Methods("POST")
         router.HandleFunc("/login", login).Methods("POST")
  router.HandleFunc("/retrieve", retrieve).Methods("POST")
-router.HandleFunc("/retrieveAll", retrieveAll).Methods("POST")
+
 log.Fatal(http.ListenAndServe(":12345", router))
 }
 
