@@ -1,28 +1,16 @@
 package main
 import (
-//"errors"
 "encoding/json"
         "fmt"
-//"errors"
-//        "github.com/jinzhu/now"
         "gopkg.in/mgo.v2/bson"
         "time"
         "log"
         "net/http"
-  //    "strings"
         "gopkg.in/mgo.v2"
         "github.com/dgrijalva/jwt-go"
- //     "github.com/gorilla/context"
         "github.com/gorilla/mux"
- //     "github.com/mitchellh/mapstructure"
 )
-//type TokenClaims struct {
-//StandardClaims:jwt.StandardClaims {
-  //         ExpiresAt: expireToken,
-    //                    Issuer:    "bandzest-auth",
-    //            },
 
-//}
 type User struct {
         Username string `json:"username"`
         Password string `json:"password"`
@@ -94,11 +82,7 @@ if err != nil {
  }  else
 {
 log.Print("ok")
-//token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-   //        "username": user.Username,
-  //             "password": user.Password,
 
-    //    })
 expireToken := time.Now().Add(time.Minute * 1).Unix()
 
 
@@ -106,7 +90,7 @@ claims := &jwt.StandardClaims{
                         ExpiresAt: expireToken,
                         Issuer:    "bandzest-auth",
 }
-// expireToken := time.Now().Add(time.Minute * 1).Unix()          
+          
 token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 fmt.Print(claims)
@@ -143,12 +127,12 @@ fmt.Print("token is expired, you should login once again to get another token")
 
      go func() {
          for i := 1; i <= count; i++ {
-               fmt.Println("token will be deleted after the expiration time")
+              // fmt.Println("token will be deleted after the expiration time")
                message <- fmt.Sprintf("deleting  the token")
           }
      }()
 
-   time.Sleep(time.Minute * 2)
+   time.Sleep(time.Second * 5)
 fmt.Println(<-message)
 err = c.Update(bson.M{"username": user.Username,"password":user.Password}, bson.M{"$set": bson.M{"token": " "}})
 
@@ -173,7 +157,7 @@ c := session.DB("test4").C("people")
 fmt.Print("connection established")
 err = c.Find(bson.M{"username": user.Username,"password":user.Password}).One(&user)
 if err != nil {
-//    if err.Error() == "not found" {
+
         log.Println("No such document")
 
 
